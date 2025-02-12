@@ -9,6 +9,7 @@ import com.itvillage.entity.Todo;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GoogleTasksRepository implements TodoRepository<String> {
@@ -43,8 +44,15 @@ public class GoogleTasksRepository implements TodoRepository<String> {
 
     @Override
     public List<Todo<String>> findAll() {
-        // TODO: Google Tasks API를 이용해서 할일 목록을 조회
-        return List.of();
+        try {
+            List<Task> tasks = service.tasks().list(defaultTaskList.getId()).execute().getItems();
+
+            return tasks.stream()
+                    .map(converter::revert)
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

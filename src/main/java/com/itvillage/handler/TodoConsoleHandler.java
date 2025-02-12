@@ -9,6 +9,7 @@ import com.itvillage.common.console.ConsolePrinter;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TodoConsoleHandler<ID> {
     private final TodoService<ID> todoService;
@@ -99,10 +100,12 @@ public class TodoConsoleHandler<ID> {
     }
 
     private void displayTodoList(List<Todo<ID>> todoList) {
+        AtomicInteger displayNo = new AtomicInteger();
+
         todoList.forEach(todo -> {
             // 출력. ex) 1. 잠자기(2024-09-12, 미완료)
             ConsolePrinter.printf("%s. %s(%s, %s)",
-                                    todo.getTodoId(),
+                                displayNo.getAndIncrement()+1,
                                     todo.getTask(),
                                     todo.getDueDate(),
                                     todo.getTaskState().getState());
