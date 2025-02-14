@@ -4,6 +4,7 @@ import com.google.api.services.tasks.Tasks;
 import com.google.api.services.tasks.model.Task;
 import com.google.api.services.tasks.model.TaskList;
 import com.itvillage.common.converter.BiDirectionalConverter;
+import com.itvillage.common.exception.NotFoundTodoException;
 import com.itvillage.config.GoogleTasksInitializer;
 import com.itvillage.entity.Todo;
 
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class GoogleTasksRepository implements TodoRepository<String> {
     private final Tasks service;
@@ -57,7 +59,19 @@ public class GoogleTasksRepository implements TodoRepository<String> {
 
     @Override
     public Todo<String> findByTodo(Todo<String> todo) {
-        // TODO: Google Tasks API를 이용해서 한 건의 특정 할일 조회
-        return null;
+        try {
+            return Optional.ofNullable(
+                            service.tasks().get(defaultTaskList.getId(), todo.getTodoId()).execute()
+                    )
+                    .map(foundTask -> {
+                        Todo<String> foundTodo = converter.revert(foundTask);
+                        foundTodo.addTodoId(foundTask.getId());
+
+                        return foundTodo;
+                    })
+                    .orElseThrow(NotFoundTodoException::new);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

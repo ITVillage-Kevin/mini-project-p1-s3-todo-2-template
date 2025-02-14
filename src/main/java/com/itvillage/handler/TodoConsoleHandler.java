@@ -73,7 +73,7 @@ public class TodoConsoleHandler<ID> {
                     int selectedTodoId = selectTodoToComplete();
 
                     // 할 일 완료 처리
-                    processCompleteTodo(todoList.get(selectedTodoId - 1));
+                    processCompleteTodo(todoList.get(selectedTodoId - 1), selectedTodoId);
                     isCompleted = true;
                 } catch (IndexOutOfBoundsException | NumberFormatException ex) {
                     ConsolePrinter.println("# 등록되지 않은 할 일 번호입니다.");
@@ -89,9 +89,9 @@ public class TodoConsoleHandler<ID> {
 
     }
 
-    private void processCompleteTodo(Todo<ID> todo) {
+    private void processCompleteTodo(Todo<ID> todo, int selectedTodoId) {
         todoService.completeTodo(todo, Todo.TaskState.COMPLETE);
-        ConsolePrinter.printf("# %s번 할 일을 완료 처리했습니다.", todo.getTodoId());
+        ConsolePrinter.printf("# %s번 할 일을 완료 처리했습니다.", selectedTodoId);
     }
 
     private int selectTodoToComplete() {
